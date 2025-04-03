@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Virtual environment
+venv/
+env/
+*.log
+
+# Django secret key and settings
+.env
+*.ini
+
+# Database and migrations
+db.sqlite3
+*/migrations/*
+
+# VS Code and JetBrains IDEs
+.vscode/
+.idea/
+
+# Other unnecessary files
+*.swp
+.DS_Store
