@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "blog",
     "disc",
     "base",
+    "customerorder",
     "rest_framework",  # Django REST Framework
 ]
 
