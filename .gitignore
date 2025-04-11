@@ -1,25 +1,66 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*.sqlite3
+*$py.class
 
-# Virtual environment
-venv/
-env/
+# Django stuff
 *.log
-
-# Django secret key and settings
-.env
-*.ini
-
-# Database and migrations
+*.pot
+*.pyc
 db.sqlite3
-*/migrations/*
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
 
-# VS Code and JetBrains IDEs
+# Environment
+.env
+.venv/
+env/
+venv/
+ENV/
+*.env
+
+# VS Code
 .vscode/
+
+# PyCharm
 .idea/
 
-# Other unnecessary files
-*.swp
+# macOS
 .DS_Store
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+coverage.xml
+*.cover
+.cache
+
+# mypy
+.mypy_cache/
+.dmypy.json
+
+# Unit test / pytest
+.pytest_cache/
+test-results.xml
+
+# pip-tools
+*.txt~
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Docker
+*.pid
+
+# Node (if you're using npm/yarn for frontend)
+node_modules/
