@@ -2,10 +2,13 @@ from rest_framework import serializers
 from .models import Description, RateBy, Desc_RateBy, WarehouseActivity
 from django.utils import timezone
 from django.utils.dateparse import parse_date
+import logging
+
+logger = logging.getLogger("description")
 
 
 class DescriptionListSerializer(serializers.ModelSerializer):
-
+    logger.debug("In desc list serializer")
     description_name = serializers.CharField(source="value")
 
     class Meta:

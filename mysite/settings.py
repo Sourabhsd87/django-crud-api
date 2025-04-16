@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "celery",
     "blog",
     "disc",
     "base",
-    "customerorder",
+    "customer",
+    "taskManager",
     "rest_framework",  # Django REST Framework
 ]
 
@@ -52,6 +54,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    
 ]
 
 ROOT_URLCONF = "mysite.urls"
@@ -116,6 +119,17 @@ USE_I18N = True
 
 USE_TZ = True
 
+#--------------------------------------------------
+# Celery Settings
+#---------------------------------------------------
+BROKER_URL = "redis://localhost:6379/0"
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = "Asia/Kolkata"
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -126,3 +140,74 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# from .celery_routes import CELERY_REGULAR_ROUTES
+# from .celery_routes import CELERYBEAT_SCHEDULE
+
+log_level = "DEBUG"
+
+# List of apps
+APPS = ["taskManager","description"]
+
+# Ensure logs directory exists
+logs_dir = os.path.join(BASE_DIR, "logs")
+print(logs_dir,"----------------------------------------------------")
+os.makedirs(logs_dir, exist_ok=True)
+
+# Create directories for each app
+for directory in APPS:
+    dir_path = os.path.join(logs_dir, directory)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+        print(f"Log directory {dir_path} not found, creating now...")
+    else:
+        pass
+
+# Logging formatters
+FORMATTERS = {
+    "verbose": {
+        "format": '{"level": "%(levelname)s", "message": "%(message)s", "time": "%(asctime)s", "function": "%(funcName)s", "correlation_id": "%(correlation_id)s"}'
+    },
+}
+
+# Dynamic handlers and loggers
+HANDLERS = {
+    "console": {
+        "level": "INFO",
+        "class": "logging.StreamHandler",
+    },
+}
+LOGGERS = {}
+
+for app in APPS:
+    handler_name = f"{app}_handler"
+    log_file = os.path.join(logs_dir, app, f"{app}.log")
+
+    HANDLERS[handler_name] = {
+        "level": log_level,
+        "class": "logging.handlers.TimedRotatingFileHandler",
+        "filename": log_file,
+        "when": "midnight",
+        "interval": 1,
+        "backupCount": 2,
+        "formatter": "verbose",
+        "filters": ["correlation_id"],
+    }
+ 
+    LOGGERS[app] = {
+        "handlers": [handler_name, "console"],
+        "level": log_level,
+        "propagate": False,  # Prevents logs from being duplicated
+    }
+ 
+# Logging configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": FORMATTERS,
+    "handlers": HANDLERS,
+    "loggers": LOGGERS,
+    "filters": {
+        "correlation_id": {"()": "django_guid.log_filters.CorrelationId"},
+    },
+}
